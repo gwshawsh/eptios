@@ -8,6 +8,10 @@
 
 import UIKit
 
+let ZIP_PATH = Bundle.main.path(forResource: "ept", ofType: "zip");
+let DOC_PATH = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)[0]
+
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -16,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        check();
         return true
     }
 
@@ -42,5 +47,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 
+}
+extension AppDelegate{
+    fileprivate func check(){
+        debugPrint("start check ")
+        let curVersion = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as? String
+        let v = UserDefaults.standard.value(forKey: "version")
+        var version = "";
+        if(v != nil ){
+            version = v as! String
+        }
+        debugPrint("version:"+version)
+        debugPrint("curversion:"+curVersion!)
+        //FileManager.default.fileExists(atPath: DOC_PATH+"/ept")
+        if(curVersion!>version){
+            do{
+                debugPrint("start unzip ")
+            try SSZipArchive.unzipFile(atPath: ZIP_PATH!, toDestination: DOC_PATH, overwrite: true, password: nil)
+                UserDefaults.standard.set(curVersion, forKey: "version")
+            }catch let err{
+                debugPrint(err)}
+        }
+    }
+    
 }
 
